@@ -3,6 +3,7 @@ import "./App.css";
 import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { SlArrowRight } from "react-icons/sl";
+import { Button } from "./components/ui/button";
 
 const WORD_LENGTH = 5;
 const TOTAL_GUESSES = 6;
@@ -95,6 +96,7 @@ function App() {
       return false;
     }
   }, []);
+
   const updateGuessedWord = useCallback(
     (word: string) => {
       setGuessedWords((current) => {
@@ -114,7 +116,6 @@ function App() {
       return;
     }
 
-    setIsValidating(true);
     const isValid = await validateWord(currentWord.trim());
     setIsValidating(false);
 
@@ -245,11 +246,11 @@ function App() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen"
+      className="flex flex-col items-center justify-center min-h-screen bg-background py-4 sm:py-8"
       onClick={() => toast.dismiss()}
     >
       <Toaster position="top-center" richColors />
-      <h1 className="text-4xl sm:text-5xl md:text-6xl text-white font-extrabold  sm:mb-8">
+      <h1 className="text-4xl  md:text-5xl lg:text-5xl text-foreground font-extrabold mb-4 sm:mb-8 pl-8 sm:pl-12">
         Guess the Word!
       </h1>
       <div className="pl-8 sm:pl-12">
@@ -260,7 +261,7 @@ function App() {
             <div key={index} className="flex flex-row items-center">
               <div className="w-8 sm:w-12 flex justify-end pr-1 sm:pr-2">
                 {isCurrentRow && (
-                  <span className="text-white text-2xl sm:text-3xl md:text-4xl">
+                  <span className="text-foreground text-2xl sm:text-3xl md:text-4xl">
                     <SlArrowRight />
                   </span>
                 )}
@@ -276,25 +277,29 @@ function App() {
         })}
       </div>
       <div className="flex gap-2 sm:gap-4 mt-4 sm:mt-8 px-4">
-        <button
-          className="px-4 py-2 sm:px-6 sm:py-3 border-2 border-red-500 bg-transparent text-white hover:bg-red-500 hover:border-red-600 text-base sm:text-xl font-semibold rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        <Button
+          variant="destructive"
+          size="lg"
+          className="text-sm sm:text-base md:text-xl px-3 py-1 sm:px-4 sm:py-2"
           onClick={(e) => {
             handleGiveUp();
-            (e.target as HTMLButtonElement).blur();
+            e.currentTarget.blur();
           }}
           disabled={gameOver}
         >
           Give Up
-        </button>
-        <button
-          className="px-4 py-2 sm:px-6 sm:py-3 border-2 border-white bg-transparent text-white hover:bg-white hover:text-black text-base sm:text-xl font-semibold rounded transition-colors"
+        </Button>
+        <Button
+          variant="outline"
+          size="lg"
+          className="text-sm sm:text-base md:text-xl px-3 py-1 sm:px-4 sm:py-2"
           onClick={(e) => {
             resetGame();
-            (e.target as HTMLButtonElement).blur();
+            e.currentTarget.blur();
           }}
         >
           Reset Game
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -358,6 +363,7 @@ function WordLine({
     </div>
   );
 }
+
 function LetterBox({
   letter,
   green,
@@ -369,8 +375,14 @@ function LetterBox({
 }) {
   return (
     <div
-      className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 border-2 sm:border-4 text-black flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold
-        ${green ? "bg-green-500" : yellow ? "bg-yellow-300" : "bg-blue-50"}`}
+      className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-22 lg:w-22 border-2 sm:border-4 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold
+        ${
+          green
+            ? "bg-green-500 text-foreground border-green-600"
+            : yellow
+            ? "bg-yellow-300 text-foreground border-yellow-400"
+            : "bg-card text-card-foreground border-border"
+        }`}
     >
       {letter}
     </div>
