@@ -65,7 +65,6 @@ function App() {
       );
       return response.status === 200;
     } catch (error) {
-      // 404 means word not found
       return false;
     }
   }, []);
