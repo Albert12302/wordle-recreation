@@ -66,7 +66,8 @@ function App() {
 
       const isValid =
         response.data.length > 0 &&
-        response.data[0].word.toLowerCase() === word.toLowerCase();
+        response.data[0].word.toLowerCase() === word.toLowerCase() &&
+        response.data[0].score > 100;
       return isValid;
     } catch (error) {
       console.error("Error validating word:", error);
@@ -179,7 +180,7 @@ function App() {
     setGameOver(false);
     setIsValidating(false);
     fetchWord();
-    toast.info("Game reset! Good luck!");
+    toast.info("Game reset!");
   }, [fetchWord]);
 
   const handleGiveUp = useCallback(() => {
