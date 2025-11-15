@@ -48,8 +48,27 @@ function App() {
         return;
       }
 
-      const randomIndex = Math.floor(Math.random() * validWords.length);
-      const word = validWords[randomIndex].word;
+      let word = "";
+      let isValidInDictionary = false;
+
+      while (!isValidInDictionary && validWords.length > 0) {
+        const randomIndex = Math.floor(Math.random() * validWords.length);
+        word = validWords[randomIndex].word;
+
+        try {
+          const dictResponse = await axios.get(
+            `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
+          );
+          isValidInDictionary = dictResponse.status === 200;
+        } catch {
+          validWords.splice(randomIndex, 1);
+        }
+      }
+
+      if (!isValidInDictionary) {
+        toast.error("Could not find a valid word. Please try again.");
+        return;
+      }
 
       const letterObject: Record<string, number> = {};
       for (const letter of word) {
