@@ -60,21 +60,15 @@ function App() {
 
   const validateWord = useCallback(async (word: string): Promise<boolean> => {
     try {
-      const response = await axios.get<DatamuseWord[]>(
-        `https://api.datamuse.com/words?sp=${word}&max=1`
+      const response = await axios.get(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
       );
-
-      const isValid =
-        response.data.length > 0 &&
-        response.data[0].word.toLowerCase() === word.toLowerCase() &&
-        response.data[0].score > 100;
-      return isValid;
+      return response.status === 200;
     } catch (error) {
-      console.error("Error validating word:", error);
+      // 404 means word not found
       return false;
     }
   }, []);
-
   const updateGuessedWord = useCallback(
     (word: string) => {
       setGuessedWords((current) => {
