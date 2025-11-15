@@ -39,9 +39,17 @@ function App() {
         return;
       }
 
-      const words = response.data;
-      const randomIndex = Math.floor(Math.random() * words.length);
-      const word = words[randomIndex].word;
+      const validWords = response.data.filter((item) =>
+        /^[a-zA-Z]{5}$/.test(item.word)
+      );
+
+      if (validWords.length === 0) {
+        toast.error("No valid words found. Please try again.");
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * validWords.length);
+      const word = validWords[randomIndex].word;
 
       const letterObject: Record<string, number> = {};
       for (const letter of word) {
@@ -216,21 +224,13 @@ function App() {
     isLoading,
   ]);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="text-white text-2xl">Loading game...</div>
-      </div>
-    );
-  }
-
   return (
     <div
       className="flex flex-col items-center justify-center min-h-screen"
       onClick={() => toast.dismiss()}
     >
       <Toaster position="top-center" richColors />
-      <h1 className="text-4xl sm:text-5xl md:text-6xl text-white font-extrabold mb-6 sm:mb-12 px-4">
+      <h1 className="text-4xl sm:text-5xl md:text-6xl text-white font-extrabold  sm:mb-8">
         Guess the Word!
       </h1>
       <div className="pl-8 sm:pl-12">
@@ -292,26 +292,53 @@ function WordLine({
   correctLetterObject: Record<string, number>;
   revealed: boolean;
 }) {
+  const letters = word.split("");
+
+  const letterStates = letters.map((letter, index) => {
+    const lowerLetter = letter.toLowerCase();
+    const isCorrectPosition = lowerLetter === correctWord[index];
+    return {
+      letter,
+      green: isCorrectPosition && revealed,
+      yellow: false,
+    };
+  });
+
+  if (revealed) {
+    const availableLetters = { ...correctLetterObject };
+
+    letterStates.forEach((state) => {
+      if (state.green) {
+        const lowerLetter = state.letter.toLowerCase();
+        availableLetters[lowerLetter] =
+          (availableLetters[lowerLetter] || 0) - 1;
+      }
+    });
+
+    letterStates.forEach((state) => {
+      if (!state.green) {
+        const lowerLetter = state.letter.toLowerCase();
+        if (availableLetters[lowerLetter] > 0) {
+          state.yellow = true;
+          availableLetters[lowerLetter]--;
+        }
+      }
+    });
+  }
+
   return (
     <div className="flex flex-row space-x-1 sm:space-x-2 m-2 sm:m-4">
-      {word.split("").map((letter, index) => {
-        const lowerLetter = letter.toLowerCase();
-        const hasCorrectLocation = lowerLetter === correctWord[index];
-        const hasCorrectLetter = lowerLetter in correctLetterObject;
-
-        return (
-          <LetterBox
-            green={hasCorrectLocation && revealed}
-            yellow={!hasCorrectLocation && hasCorrectLetter && revealed}
-            key={index}
-            letter={letter}
-          />
-        );
-      })}
+      {letterStates.map((state, index) => (
+        <LetterBox
+          key={index}
+          letter={state.letter}
+          green={state.green}
+          yellow={state.yellow}
+        />
+      ))}
     </div>
   );
 }
-
 function LetterBox({
   letter,
   green,
