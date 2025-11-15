@@ -4,6 +4,13 @@ import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { SlArrowRight } from "react-icons/sl";
 import { Button } from "./components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./components/ui/dropdown-menu";
+import { Moon, Sun } from "lucide-react";
 
 const WORD_LENGTH = 5;
 const TOTAL_GUESSES = 6;
@@ -12,6 +19,8 @@ interface DatamuseWord {
   word: string;
   score: number;
 }
+
+type Theme = "light" | "dark";
 
 function App() {
   const [guessedWords, setGuessedWords] = useState<string[]>(
@@ -27,6 +36,17 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [isValidating, setIsValidating] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem("theme") as Theme;
+    return savedTheme || "light";
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const fetchWord = useCallback(async () => {
     try {
@@ -120,7 +140,7 @@ function App() {
     setIsValidating(false);
 
     if (!isValid) {
-      toast.error("Not a valid word!");
+      toast.error("Not in the word list!");
       return;
     }
     updateGuessedWord(currentWord);
@@ -246,13 +266,35 @@ function App() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen bg-background py-4 sm:py-8"
+      className="flex flex-col items-center justify-center min-h-screen bg-background py-4 sm:py-8 relative"
       onClick={() => toast.dismiss()}
     >
       <Toaster position="top-center" richColors />
-      <h1 className="text-4xl  md:text-5xl lg:text-5xl text-foreground font-extrabold mb-4 sm:mb-8 pl-8 sm:pl-12">
+
+      <div className="absolute top-4 right-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="text-sm sm:text-base md:text-xl px-3 py-1 sm:px-4 sm:py-2">
+              <span>Select Theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              <Sun className="mr-2 h-4 w-4" />
+              <span>Light</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              <Moon className="mr-2 h-4 w-4" />
+              <span>Dark</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <h1 className="text-[27px] sm:text-4xl md:text-5xl lg:text-[52px] text-foreground font-extrabold mb-4 sm:mb-8 pl-8 sm:pl-12">
         Guess the Word!
       </h1>
+
       <div className="pl-8 sm:pl-12">
         {guessedWords.map((word, index) => {
           const isCurrentRow = index === wordCount && !gameOver;
@@ -290,7 +332,6 @@ function App() {
           Give Up
         </Button>
         <Button
-          variant="outline"
           size="lg"
           className="text-sm sm:text-base md:text-xl px-3 py-1 sm:px-4 sm:py-2"
           onClick={(e) => {
@@ -376,13 +417,13 @@ function LetterBox({
   return (
     <div
       className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-22 lg:w-22 border-2 sm:border-4 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold
-        ${
-          green
-            ? "bg-green-500 text-foreground border-green-600"
-            : yellow
-            ? "bg-yellow-300 text-foreground border-yellow-400"
-            : "bg-card text-card-foreground border-border"
-        }`}
+    ${
+      green
+        ? "bg-green-500 border-green-600 text-black dark:bg-green-600 dark:border-green-700 dark:text-black"
+        : yellow
+        ? "bg-yellow-300 border-yellow-400 text-black dark:bg-yellow-500 dark:border-yellow-600 dark:text-black"
+        : "bg-card text-card-foreground border-border"
+    }`}
     >
       {letter}
     </div>
