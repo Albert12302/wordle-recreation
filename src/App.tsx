@@ -419,13 +419,13 @@ function LetterBox({
 }) {
   return (
     <div
-      className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-22 lg:w-22 border-2 sm:border-4 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold
+      className={`w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-22 lg:w-22 border-2 sm:border-4 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold 
     ${
       green
         ? "bg-green-500 border-green-600 text-black dark:bg-green-600 dark:border-green-700 dark:text-black"
         : yellow
         ? "bg-yellow-300 border-yellow-400 text-black dark:bg-yellow-500 dark:border-yellow-600 dark:text-black"
-        : "bg-card text-card-foreground border-border"
+        : "bg-white dark:bg-gray-800 text-black dark:text-gray-200 border-gray-300 dark:border-gray-600"
     }`}
     >
       {letter}
