@@ -10,7 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./components/ui/dropdown-menu";
-import { Moon, Sun } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./components/ui/dialog";
+import { Moon, Sun, HelpCircle } from "lucide-react";
 
 const WORD_LENGTH = 5;
 const TOTAL_GUESSES = 6;
@@ -271,7 +279,119 @@ function App() {
     >
       <Toaster position="top-center" richColors />
 
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex gap-2">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              className="text-sm sm:text-base md:text-xl bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={(e) => e.currentTarget.blur()}
+            >
+              <HelpCircle className="h-5 w-5 text-gray-900 dark:text-gray-100" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent
+            className="max-w-md [&>button]:text-gray-900 [&>button]:dark:text-white [&>button:hover]:bg-gray-100 [&>button:hover]:dark:bg-gray-800 [&>button]:top-7"
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-foreground">
+                How to Play
+              </DialogTitle>
+              <DialogDescription className="text-left space-y-4 pt-4">
+                <p className="text-base">Guess the wordle in 6 tries.</p>
+
+                <div className="space-y-2">
+                  <p className="font-semibold text-foreground">Rules:</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    <li>Each guess must be a valid 5-letter word</li>
+                    <li>Press enter to submit your guess</li>
+                    <li>The color of the tiles will change after each guess</li>
+                    <li>Press "Reset Game" to start a new round.</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="font-semibold text-foreground">Examples:</p>
+
+                  <div className="space-y-1">
+                    <div className="flex gap-1">
+                      <div className="w-10 h-10 border-2 bg-green-500 border-green-600 flex items-center justify-center text-xl font-bold text-black">
+                        W
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        E
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        A
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        R
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        Y
+                      </div>
+                    </div>
+                    <p className="text-sm">
+                      <span className="font-semibold">W</span> is in the word
+                      and in the correct position
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex gap-1">
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        P
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-yellow-300 dark:bg-yellow-500 border-yellow-400 dark:border-yellow-600 flex items-center justify-center text-xl font-bold text-black">
+                        I
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        L
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        L
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        S
+                      </div>
+                    </div>
+                    <p className="text-sm">
+                      <span className="font-semibold">I</span> is in the word
+                      but in the wrong position
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex gap-1">
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        V
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        A
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        G
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        U
+                      </div>
+                      <div className="w-10 h-10 border-2 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 flex items-center justify-center text-xl font-bold text-black dark:text-white">
+                        E
+                      </div>
+                    </div>
+                    <p className="text-sm">
+                      <span className="font-semibold">U</span> is not in the
+                      word in any position
+                    </p>
+                  </div>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="text-sm sm:text-base md:text-xl px-3 py-1 sm:px-4 sm:py-2">
