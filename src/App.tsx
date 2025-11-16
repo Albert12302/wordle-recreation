@@ -278,7 +278,10 @@ function App() {
               <span>Select Theme</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent
+            align="end"
+            onCloseAutoFocus={(e) => e.preventDefault()}
+          >
             <DropdownMenuItem onClick={() => setTheme("light")}>
               <Sun className="mr-2 h-4 w-4" />
               <span>Light</span>
