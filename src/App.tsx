@@ -300,7 +300,7 @@ function App() {
                 How to Play
               </DialogTitle>
               <DialogDescription className="text-left space-y-4 pt-4">
-                <p className="text-base">Guess the wordle in 6 tries.</p>
+                <p className="text-base">Guess the word in 6 tries.</p>
 
                 <div className="space-y-2">
                   <p className="font-semibold text-foreground">Rules:</p>
@@ -308,7 +308,7 @@ function App() {
                     <li>Each guess must be a valid 5-letter word</li>
                     <li>Press enter to submit your guess</li>
                     <li>The color of the tiles will change after each guess</li>
-                    <li>Press "Reset Game" to start a new round.</li>
+                    <li>Press "Reset Game" to start a new round</li>
                   </ul>
                 </div>
 
