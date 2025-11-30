@@ -294,6 +294,7 @@ function App() {
           <DialogContent
             className="max-w-md [&>button]:text-gray-900 [&>button]:dark:text-white [&>button:hover]:bg-gray-100 [&>button:hover]:dark:bg-gray-800 [&>button]:top-7"
             onCloseAutoFocus={(e) => e.preventDefault()}
+            onOpenAutoFocus={(e) => e.preventDefault()}
           >
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-foreground">
