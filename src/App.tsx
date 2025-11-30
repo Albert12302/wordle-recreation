@@ -395,7 +395,7 @@ function App() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button className="text-sm sm:text-base md:text-xl px-3 py-1 sm:px-4 sm:py-2">
-              <span>Select Theme</span>
+              <span>{theme === "light" ? "Light" : "Dark"}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
