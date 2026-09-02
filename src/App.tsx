@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 import "./App.css";
-import axios from "axios";
 import { toast, Toaster } from "sonner";
 import { SlArrowRight } from "react-icons/sl";
 import { Button } from "./components/ui/button";
@@ -19,20 +18,16 @@ import {
   DialogTrigger,
 } from "./components/ui/dialog";
 import { Moon, Sun, HelpCircle } from "lucide-react";
+import { isValidWord, pickRandomWord } from "../src/words";
 
 const WORD_LENGTH = 5;
 const TOTAL_GUESSES = 6;
-
-interface DatamuseWord {
-  word: string;
-  score: number;
-}
 
 type Theme = "light" | "dark";
 
 function App() {
   const [guessedWords, setGuessedWords] = useState<string[]>(
-    new Array(TOTAL_GUESSES).fill("     ")
+    new Array(TOTAL_GUESSES).fill("     "),
   );
   const [correctWord, setCorrectWord] = useState("");
   const [wordCount, setWordCount] = useState(0);
@@ -42,11 +37,9 @@ function App() {
   const [letterCount, setLetterCount] = useState(0);
   const [currentWord, setCurrentWord] = useState("     ");
   const [gameOver, setGameOver] = useState(false);
-  const [isValidating, setIsValidating] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme;
-    return savedTheme || "light";
+    const savedTheme = localStorage.getItem("theme") as Theme | null;
+    return savedTheme ?? "light";
   });
 
   useEffect(() => {
@@ -56,73 +49,16 @@ function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const fetchWord = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get<DatamuseWord[]>(
-        "https://api.datamuse.com/words?sp=?????&max=1000"
-      );
+  const fetchWord = useCallback(() => {
+    const word = pickRandomWord();
 
-      if (!response.data || response.data.length === 0) {
-        toast.error("Failed to fetch word. Please try again.");
-        return;
-      }
-
-      const validWords = response.data.filter((item) =>
-        /^[a-zA-Z]{5}$/.test(item.word)
-      );
-
-      if (validWords.length === 0) {
-        toast.error("No valid words found. Please try again.");
-        return;
-      }
-
-      let word = "";
-      let isValidInDictionary = false;
-
-      while (!isValidInDictionary && validWords.length > 0) {
-        const randomIndex = Math.floor(Math.random() * validWords.length);
-        word = validWords[randomIndex].word;
-
-        try {
-          const dictResponse = await axios.get(
-            `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-          );
-          isValidInDictionary = dictResponse.status === 200;
-        } catch {
-          validWords.splice(randomIndex, 1);
-        }
-      }
-
-      if (!isValidInDictionary) {
-        toast.error("Could not find a valid word. Please try again.");
-        return;
-      }
-
-      const letterObject: Record<string, number> = {};
-      for (const letter of word) {
-        letterObject[letter] = (letterObject[letter] || 0) + 1;
-      }
-
-      setCorrectWord(word);
-      setCorrectLetterObject(letterObject);
-    } catch (error) {
-      console.error("Error fetching word:", error);
-      toast.error("Failed to fetch word. Please try again.");
-    } finally {
-      setIsLoading(false);
+    const letterObject: Record<string, number> = {};
+    for (const letter of word) {
+      letterObject[letter] = (letterObject[letter] || 0) + 1;
     }
-  }, []);
 
-  const validateWord = useCallback(async (word: string): Promise<boolean> => {
-    try {
-      const response = await axios.get(
-        `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-      );
-      return response.status === 200;
-    } catch (error) {
-      return false;
-    }
+    setCorrectWord(word);
+    setCorrectLetterObject(letterObject);
   }, []);
 
   const updateGuessedWord = useCallback(
@@ -133,31 +69,31 @@ function App() {
         return updated;
       });
     },
-    [wordCount]
+    [wordCount],
   );
 
-  const handleEnter = useCallback(async () => {
-    if (gameOver || isValidating) return;
+  const handleEnter = useCallback(() => {
+    if (gameOver) return;
 
     if (letterCount !== WORD_LENGTH) {
       toast.error("Words must be five letters.");
       return;
     }
 
-    const isValid = await validateWord(currentWord.trim());
-    setIsValidating(false);
+    const guess = currentWord.trim();
 
-    if (!isValid) {
+    if (!isValidWord(guess)) {
       toast.error("Not in the word list!");
       return;
     }
+
     updateGuessedWord(currentWord);
 
-    if (currentWord.toLowerCase() === correctWord.toLowerCase()) {
+    if (guess.toLowerCase() === correctWord.toLowerCase()) {
       setGameOver(true);
       setTimeout(
         () => toast.success("You've Won!", { duration: Infinity }),
-        100
+        100,
       );
       return;
     }
@@ -169,7 +105,7 @@ function App() {
           toast.error(`You've Lost! The word was: ${correctWord}`, {
             duration: Infinity,
           }),
-        100
+        100,
       );
       return;
     }
@@ -179,17 +115,15 @@ function App() {
     setCurrentWord("     ");
   }, [
     gameOver,
-    isValidating,
     letterCount,
     currentWord,
-    validateWord,
     updateGuessedWord,
     correctWord,
     wordCount,
   ]);
 
   const handleBackspace = useCallback(() => {
-    if (letterCount === 0 || gameOver || isValidating) {
+    if (letterCount === 0 || gameOver) {
       return;
     }
 
@@ -200,11 +134,11 @@ function App() {
     });
 
     setLetterCount((current) => current - 1);
-  }, [letterCount, gameOver, isValidating]);
+  }, [letterCount, gameOver]);
 
   const handleAlphabetical = useCallback(
     (key: string) => {
-      if (letterCount === WORD_LENGTH || gameOver || isValidating) {
+      if (letterCount === WORD_LENGTH || gameOver) {
         return;
       }
 
@@ -216,7 +150,7 @@ function App() {
 
       setLetterCount((current) => current + 1);
     },
-    [letterCount, gameOver, isValidating]
+    [letterCount, gameOver],
   );
 
   const resetGame = useCallback(() => {
@@ -227,7 +161,6 @@ function App() {
     setLetterCount(0);
     setCurrentWord("     ");
     setGameOver(false);
-    setIsValidating(false);
     fetchWord();
     toast.info("Game reset!");
   }, [fetchWord]);
@@ -247,7 +180,7 @@ function App() {
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (gameOver || isValidating || isLoading) return;
+      if (gameOver) return;
 
       if (e.key === "Enter") {
         handleEnter();
@@ -263,14 +196,7 @@ function App() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [
-    handleEnter,
-    handleBackspace,
-    handleAlphabetical,
-    gameOver,
-    isValidating,
-    isLoading,
-  ]);
+  }, [handleEnter, handleBackspace, handleAlphabetical, gameOver]);
 
   return (
     <div
@@ -544,8 +470,8 @@ function LetterBox({
       green
         ? "bg-green-500 border-green-600 text-black dark:bg-green-600 dark:border-green-700 dark:text-black"
         : yellow
-        ? "bg-yellow-300 border-yellow-400 text-black dark:bg-yellow-500 dark:border-yellow-600 dark:text-black"
-        : "bg-white dark:bg-gray-800 text-black dark:text-gray-200 border-gray-300 dark:border-gray-600"
+          ? "bg-yellow-300 border-yellow-400 text-black dark:bg-yellow-500 dark:border-yellow-600 dark:text-black"
+          : "bg-white dark:bg-gray-800 text-black dark:text-gray-200 border-gray-300 dark:border-gray-600"
     }`}
     >
       {letter}
